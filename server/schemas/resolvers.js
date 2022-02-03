@@ -16,6 +16,61 @@ const resolvers = {
               }
               throw new AuthenticationError('You have to log in first');
         }
+    },
+    Mutation: {
+        login: async (parent, { email, password }) => {
+            const user = await User.findOne({ email });
+
+            if (!user) {
+              throw new AuthenticationError('No user found with this email address');
+            }
+      
+            const correctPw = await user.isCorrectPassword(password);
+      
+            if (!correctPw) {
+              throw new AuthenticationError('Incorrect credentials');
+            }
+      
+            const token = signToken(user);
+      
+            return { token, user };
+        },
+        createUser: async (parent, { username, email, password }) => {
+            const user = await User.create({ username, email, password });
+            const token = signToken(user);
+            return { token, user };
+        },
+        saveBook: async (parent, { userId, bookId }, context) => {
+            if (context.user) {
+                return User.findOneAndUpdate(
+                    {  _id: userId },
+                    {
+                        $addToSet: {
+                            savedBooks: { bookId }
+                        }
+                    },
+                    {
+                        new: true,
+                        runValidators: true
+                    }
+                )
+            }
+            throw new AuthenticationError('You must be logged in to save books.')
+        },
+        deleteBook: async (parent, { userId, bookId }, context) => {
+            if (context.user) {
+                return User.findOneAndUpdate(
+                    { _id: userId },
+                    {
+                        $pull: {
+                            savedBooks: { bookId }
+                        }
+                    },
+                    { new: true }
+                )
+            }
+            throw new AuthenticationError('You have to be logged in to remove books.')
+        }
     }
 }
 
