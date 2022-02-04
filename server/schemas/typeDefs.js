@@ -22,10 +22,6 @@ const typeDefs = gql`
         user: User
     }
     type Query {
-        books: [Book]
-        book(title: String!): Book
-        users: [User]
-        user(username: String!): User
         me: User
     }
     type Mutation {
