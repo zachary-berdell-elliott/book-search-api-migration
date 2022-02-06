@@ -66,7 +66,7 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await useMutation(SAVE_BOOK);
+      const response = useMutation(SAVE_BOOK);
 
       if (!response.ok) {
         throw new Error('something went wrong!');
