@@ -14,7 +14,7 @@ This is an application that works as a book search engine. It allows a user to s
 * [Questions](#questions)
 
 ## Installation 
-This application can be installed by cloning this repository. You will then run `npm run build` in the root directory then `npm run develop` to start the application.
+This application can be installed by cloning this repository. You will then run `npm run install` and `npm run build` in the root directory then `npm run develop` to start the application.
 
 ## Usage 
 This application can be used in the heroku live link. First you will need to sign up with a username, email, and password. After that you can search for books and save them by clicking the save button. The saved books can then be viewed in the saved books page.
