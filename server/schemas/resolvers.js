@@ -1,12 +1,12 @@
 const { AuthenticationError } = require('apollo-server-express');
-const { User, Book } = require('../models');
+const { User } = require('../models');
 const { signToken } = require('../utils/auth');
 
 const resolvers = {
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
-                return User.findOne({ _id: context.user._id }).populate('books');
+                return User.findOne({ _id: context.user._id }).select('-__v-password');
               }
               throw new AuthenticationError('You have to log in first');
         }
@@ -29,32 +29,33 @@ const resolvers = {
       
             return { token, user };
         },
-        createUser: async (parent, { username, email, password }) => {
-            const user = await User.create({ username, email, password });
+        createUser: async (parent, args) => {
+            const user = await User.create(args);
             const token = signToken(user);
             return { token, user };
         },
-        saveBook: async (parent, { bookData }, context) => {
+        saveBook: async (parent, { bookData }, context ) => {
+            console.log('Working');
             if (context.user) {
-                return User.findOneAndUpdate(
-                    {  _id: userId },
+                const userBookData = await User.findByIdAndUpdate(
+                    {  _id: context.user._id },
                     {
-                        $addToSet: {
-                            savedBooks: { bookData }
+                        $push: {
+                            savedBooks: bookData 
                         }
                     },
                     {
-                        new: true,
-                        runValidators: true
+                        new: true
                     }
                 )
+                return userBookData;
             }
             throw new AuthenticationError('You must be logged in to save books.')
         },
-        deleteBook: async (parent, { userId, bookId }, context) => {
+        deleteBook: async (parent, { bookId }, context) => {
             if (context.user) {
-                return User.findOneAndUpdate(
-                    { _id: userId },
+                return await User.findByIdAndUpdate(
+                    { _id: context.user._id },
                     {
                         $pull: {
                             savedBooks: { bookId }
