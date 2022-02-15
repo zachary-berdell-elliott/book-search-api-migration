@@ -10,6 +10,7 @@ const SavedBooks = () => {
 
   const userData = useQuery(GET_ME);
   const deleteBook = useMutation(REMOVE_BOOK);
+  console.log(userData);
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -50,10 +51,8 @@ const SavedBooks = () => {
             : 'You have no saved books!'}
         </h2>
         <CardColumns>
-          {() => {
-            if (userData.savedBooks) {
-              userData.savedBooks.map((book) => {
-               return (
+          { userData.savedBooks ?
+              userData.savedBooks.map((book) => (
                   <Card key={book.bookId} border='dark'>
                     {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
                     <Card.Body>
@@ -65,9 +64,10 @@ const SavedBooks = () => {
                       </Button>
                     </Card.Body>
                   </Card>
-                );
-               })
-            }}}
+              ))
+              :
+              <></>
+            }
         </CardColumns>
       </Container>
     </>
